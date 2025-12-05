@@ -13,13 +13,16 @@ import { Profile } from './screens/Profile';
 import { Settings } from './screens/Settings';
 import { Updates } from './screens/Updates';
 import { NotFound } from './screens/NotFound';
+import { Login } from './screens/Login';
+import { Ionicons } from '@expo/vector-icons';
+import { Confirmation } from './screens/Confirmation';
 
 const HomeTabs = createBottomTabNavigator({
   screens: {
     Home: {
       screen: Home,
       options: {
-        title: 'Feed',
+        title: 'Delivery App',
         tabBarIcon: ({ color, size }) => (
           <Image
             source={newspaper}
@@ -47,11 +50,49 @@ const HomeTabs = createBottomTabNavigator({
         ),
       },
     },
+    Settings: {
+      screen: Settings,
+      options: {
+        tabBarIcon: ({ color, size }) => (
+          <Image
+            source={bell}
+            tintColor={color}
+            style={{
+              width: size,
+              height: size,
+            }}
+          />
+        ),
+      },
+    },
+    Profile: {
+      screen: Profile,
+      options: {
+        tabBarIcon: ({ color, size }) => (
+          <Image
+            source={bell}
+            tintColor={color}
+            style={{
+              width: size,
+              height: size,
+            }}
+          />
+        ),
+      },
+    },
   },
 });
 
 const RootStack = createNativeStackNavigator({
+  initialRouteName: "Login",
   screens: {
+    Login: {
+      screen: Login,
+      options: {
+        title: 'Login',
+        headerShown: false,
+      },
+    },
     HomeTabs: {
       screen: HomeTabs,
       options: {
@@ -82,6 +123,12 @@ const RootStack = createNativeStackNavigator({
         ),
       }),
     },
+    Confirmation: {
+      screen: Confirmation,
+      options: {
+        title: "Potwierdzenie odbioru",
+      },
+    },
     NotFound: {
       screen: NotFound,
       options: {
@@ -96,7 +143,7 @@ const RootStack = createNativeStackNavigator({
 
 export const Navigation = createStaticNavigation(RootStack);
 
-type RootStackParamList = StaticParamList<typeof RootStack>;
+type RootStackParamList = StaticParamList<typeof RootStack>
 
 declare global {
   namespace ReactNavigation {

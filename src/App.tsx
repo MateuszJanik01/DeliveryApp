@@ -6,6 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { useColorScheme } from 'react-native';
 import { Navigation } from './navigation';
+import { initDatabase } from './db/database';
+import { useEffect } from 'react';
 
 Asset.loadAsync([
   ...NavigationAssets,
@@ -21,6 +23,10 @@ export function App() {
   const colorScheme = useColorScheme();
 
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme
+
+  useEffect(() => {
+    initDatabase();
+  }, []);
 
   return (
     <Navigation

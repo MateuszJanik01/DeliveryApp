@@ -4,8 +4,21 @@ import { Order } from "../models/order";
 
 export const db = SQLite.openDatabaseAsync("delivery.db");
 
-export async function initDatabase() {
-    (await db).execAsync(`
+export async function resetDatabase() {
+    const database = await db;
+    
+    await database.execAsync(`
+        DROP TABLE IF EXISTS users;
+        DROP TABLE IF EXISTS orders;
+    `);
+    
+    await initDatabase();
+}
+
+async function initDatabase() {
+    const database = await db;
+
+    await database.execAsync(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT NOT NULL,
@@ -14,31 +27,32 @@ export async function initDatabase() {
         );
     `);
 
-    (await db).execSync(`
+    await database.execAsync(`
         CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        orderNumber TEXT NOT NULL,
-        confirmed BOOLEAN NOT NULL,
-        details TEXT
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            number TEXT NOT NULL,
+            confirmed BOOLEAN NOT NULL,
+            details TEXT
     );
     `);
 
     const defaultUsers = [
         new User(0, "admin@example.com", "admin123", "admin"),
         new User(0, "user@example.com", "user123", "user"),
-        new User(0, "driver@example.com", "driver123", "driver")
+        new User(0, "driver@example.com", "driver123", "courier")
     ];
 
-    defaultUsers.forEach(async user => {
-        const existingUser = (await db).getFirstAsync<User>(
+    for (const user of defaultUsers) {
+        const existingUser = await database.getFirstAsync<User>(
             "SELECT * FROM users WHERE email = ?", [user.email]
         );
         if (!existingUser) {
-            (await db).runAsync(
-                "INSERT INTO users (email, password, role) VALUES (?, ?, ?)", [user.email, user.password, user.role]
+            await database.runAsync(
+                "INSERT INTO users (email, password, role) VALUES (?, ?, ?)", 
+                [user.email, user.password, user.role]
             );
         }
-    });
+    }
 
     // const allUsers = (await db).getAllAsync<User>('Select * from users');
     // for (const row of await allUsers) {
@@ -53,21 +67,21 @@ export async function initDatabase() {
         new Order(0, "ORD003", false, "Package 3 details")
     ];
 
-    defaultOrders.forEach(async pkg => {
-        const existingOrder = (await db).getFirstSync(
-            "SELECT * FROM orders WHERE orderNumber = ?", [pkg.orderNumber]
+    for (const pkg of defaultOrders) {
+        const existingOrder = await database.getFirstAsync(
+            "SELECT * FROM orders WHERE number = ?", [pkg.number]
         );
         if (!existingOrder) {
-            (await db).runSync(
-                "INSERT INTO orders (orderNumber, confirmed, details) VALUES (?, ?, ?)",
-                [pkg.orderNumber, pkg.confirmed ? 1 : 0, pkg.details]
+            await database.runAsync(
+                "INSERT INTO orders (number, confirmed, details) VALUES (?, ?, ?)",
+                [pkg.number, pkg.confirmed ? 1 : 0, pkg.details]
             );
         }
-    });
+    }
 
-    // const allOrders = (await db).getAllAsync<{ id: number; orderNumber: string; confirmed: number; details: string }>('Select * from orders');
+    // const allOrders = (await db).getAllAsync<{ id: number; number: string; confirmed: number; details: string }>('Select * from orders');
     // for (const row of await allOrders) {
-    //     console.log(`Order: ${row.id}, Order Number: ${row.orderNumber}, Confirmed: ${row.confirmed}`);
+    //     console.log(`Order: ${row.id}, Order Number: ${row.number}, Confirmed: ${row.confirmed}`);
     // }
 
     // console.log(((await allOrders).length));

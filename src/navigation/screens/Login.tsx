@@ -3,8 +3,12 @@ import { View, StyleSheet, TextInput, Alert } from "react-native";
 import { Button, Text } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { findUserByEmail } from "../../db/userRepository";
+import { useAuth } from "../../context/AuthContext";
+
 
 export function Login() {
+  const { setRole } = useAuth();
+
   const navigation = useNavigation();
 
   const [email, setEmail] = React.useState("");
@@ -40,6 +44,10 @@ export function Login() {
         Alert.alert("Błąd logowania", "Nieprawidłowe hasło");
         return;
       }
+
+      setRole(user.role);
+
+      // navigation.navigate("HomeTabs", { userId: user.id });
 
       navigation.reset({
         index: 0,

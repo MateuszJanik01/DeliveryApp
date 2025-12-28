@@ -6,8 +6,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { useColorScheme } from 'react-native';
 import { Navigation } from './navigation';
-import { initDatabase } from './db/database';
+import { resetDatabase } from './db/database';
 import { useEffect } from 'react';
+import { AuthProvider } from './context/AuthContext';
 
 Asset.loadAsync([
   ...NavigationAssets,
@@ -25,19 +26,21 @@ export function App() {
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme
 
   useEffect(() => {
-    initDatabase();
+    resetDatabase();
   }, []);
 
   return (
+    <AuthProvider>
     <Navigation
-      theme={theme}
-      linking={{
-        enabled: 'auto',
-        prefixes: [prefix],
-      }}
-      onReady={() => {
-        SplashScreen.hideAsync();
-      }}
-    />
-  );
+        theme={theme}
+        linking={{
+          enabled: 'auto',
+          prefixes: [prefix],
+        }}
+        onReady={() => {
+          SplashScreen.hideAsync();
+        }}
+      />
+    </AuthProvider>
+    );
 }

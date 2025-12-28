@@ -16,12 +16,14 @@ import { NotFound } from './screens/NotFound';
 import { Login } from './screens/Login';
 import { Ionicons } from '@expo/vector-icons';
 import { Confirmation } from './screens/Confirmation';
+import { HeaderTitle } from './screens/HeaderTitle';
 
 const HomeTabs = createBottomTabNavigator({
   screens: {
     Home: {
       screen: Home,
       options: {
+        headerTitle: () => <HeaderTitle/>,
         title: 'Delivery App',
         tabBarIcon: ({ color, size }) => (
           <Image
@@ -100,29 +102,29 @@ const RootStack = createNativeStackNavigator({
         headerShown: false,
       },
     },
-    Profile: {
-      screen: Profile,
-      linking: {
-        path: ':user(@[a-zA-Z0-9-_]+)',
-        parse: {
-          user: (value) => value.replace(/^@/, ''),
-        },
-        stringify: {
-          user: (value) => `@${value}`,
-        },
-      },
-    },
-    Settings: {
-      screen: Settings,
-      options: ({ navigation }) => ({
-        presentation: 'modal',
-        headerRight: () => (
-          <HeaderButton onPress={navigation.goBack}>
-            <Text>Close</Text>
-          </HeaderButton>
-        ),
-      }),
-    },
+    // Profile: {
+    //   screen: Profile,
+    //   linking: {
+    //     path: ':user(@[a-zA-Z0-9-_]+)',
+    //     parse: {
+    //       user: (value) => value.replace(/^@/, ''),
+    //     },
+    //     stringify: {
+    //       user: (value) => `@${value}`,
+    //     },
+    //   },
+    // },
+    // Settings: {
+    //   screen: Settings,
+    //   options: ({ navigation }) => ({
+    //     presentation: 'modal',
+    //     headerRight: () => (
+    //       <HeaderButton onPress={navigation.goBack}>
+    //         <Text>Close</Text>
+    //       </HeaderButton>
+    //     ),
+    //   }),
+    // },
     Confirmation: {
       screen: Confirmation,
       options: {

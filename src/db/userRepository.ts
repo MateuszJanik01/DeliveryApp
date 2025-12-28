@@ -27,5 +27,9 @@ export async function loginUser(
 }
 export { User };
     
-
-
+export async function getUserById(id: number): Promise<User | null> {
+    const user = (await db).getFirstAsync<User>(
+        "SELECT * FROM users WHERE id = ?", [id]
+    );
+    return user || null;
+}

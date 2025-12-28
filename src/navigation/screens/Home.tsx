@@ -1,41 +1,80 @@
-import { Button, Text} from "@react-navigation/elements";
-import React from "react";
-import {
-  View,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { Button, Text } from "@react-navigation/elements";
+import React, { useEffect, useState } from "react";
+import { View, Pressable, StyleSheet } from "react-native";
+import { Order } from "../../models/order";
+import { getAllOrders } from "../../db/orderRepositorty";
+import { StaticScreenProps } from "@react-navigation/native";
 
+type Props = StaticScreenProps<{
+  userId?: number;
+}>
 
-export function Home() {
-  const [open, setOpen] = React.useState(false);
+export function Home({ route }: Props) {
+  const [openOrderId, setOpenOrderId] = useState<number | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const userId = route.params?.userId;
 
+  useEffect(() => {
+    const loadOrders = async () => {
+      const data = await getAllOrders();
+      setOrders(data);
+    };
+
+    loadOrders();
+  }, []);
+
+  const toggleOrder = (id: number) => {
+    setOpenOrderId((prev) => (prev === id ? null : id));
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.box}>
-        <Pressable onPress={() => setOpen(!open)} style={styles.header}>
-          <Text style={styles.headerText}>Kliknij, aby rozwinąć</Text>
-          <Text style={styles.icon}>{open ? "▲" : "▼"}</Text>
-        </Pressable>
+      {orders.map((order) => {
+        const isOpen = openOrderId === order.id;
 
-        {open && (
-          <View style={styles.details}>
-            <Text style={styles.detailsText}>
-              To są szczegóły widoczne po rozwinięciu!
-            </Text>
-            <Button screen="Confirmation" params={{ orderId: "12345" }}>Potwierdź zamówienie</Button>
+        return (
+          <View key={order.id} style={styles.box}>
+            <Pressable
+              onPress={() => toggleOrder(order.id)}
+              style={styles.header}
+            >
+              <Text style={styles.headerText}>
+                Zamówienie #{order.number}
+              </Text>
+              <Text style={styles.icon}>{isOpen ? "▲" : "▼"}</Text>
+            </Pressable>
+
+            {isOpen && (
+              <View style={styles.details}>
+                <Text style={styles.detailsText}>
+                  {order.details ?? "Brak szczegółów zamówienia"}
+                </Text>
+
+                {!order.confirmed && (
+                  <Button
+                    variant="filled"
+                    color="#000"
+                    screen="Confirmation"
+                    params={{ orderId: order.number }}
+                  >
+                    Potwierdź zamówienie
+                  </Button>
+                )}
+              </View>
+            )}
           </View>
-        )}
-      </View>
+        );
+      })}
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    gap: 12,
   },
 
   box: {
@@ -83,3 +122,4 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
+
